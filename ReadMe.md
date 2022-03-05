@@ -19,6 +19,11 @@
                 - `@ControllerAdvice` 선언하면 됨
                     - setter가 아닌 Field에 직접 접근 하는 것
                         - `iniDirectFieldAccess`
+- Controller에서 `Dto.toEntity()`를 통해서 바로 전달해도 되는데 Service에서 DTO를 받는 이유?
+    - Controller와 Service의 역할을 분리하기 위함이다. 👉  [OSIV와 성능 최적화](https://www.notion.so/OSIV-0e1aafd1b33441b4a8e1341c1a37715f)
+    - 비즈니스 로직 & 트랜잭션 관리 모두 Service에서 관리하고, View와 연동되는 부분은 Controller에서 담당하도록 구성
+- 트랜잭션? [트랜잭션 (Transaction) // ACID](https://www.notion.so/Transaction-ACID-cff3ccc4b5ac422d8cd3f98b47970275)  `,`  [OSIV와 성능 최적화](https://www.notion.so/OSIV-0e1aafd1b33441b4a8e1341c1a37715f)
+    - Service 메서드는 `@Transaction`을 기본으로 갖는다.
 
 ---
 
@@ -56,7 +61,7 @@
 </aside>
 
 - Entity 클래스 생성
-    - `@Builder`를 사용한 이유 [빌더 패턴 (Builder pattern)](https://www.notion.so/Builder-pattern-0d3ed3011dbe4ad598275719ce9a5b22) [Setter, @Builder](https://www.notion.so/Setter-Builder-d0a0af8305be4e7c82d4e923fb2ec2c1)
+    - `@Builder`를 사용한 이유 [빌더 패턴 (Builder pattern)](https://www.notion.so/Builder-pattern-0d3ed3011dbe4ad598275719ce9a5b22) [Setter, Builder](https://www.notion.so/Setter-Builder-d0a0af8305be4e7c82d4e923fb2ec2c1)
         - 생성자의 경우 지금 채워야할 필드가 무엇인지 명확히 지정할 수가 없기 때문이다.
 
 
@@ -80,5 +85,107 @@
     - 왜 Entity 클래스에서는 `@Setter`를 사용하지 않는데 DTO에서는 사용할까?
         - Controller에서 @RequestBody로 외부에서 데이터를 받는 경우엔 `기본생성자 + set메서드`를 통해서만 값이 할당 된다.
         - 그래서 이때만 `setter`를 허용한다.
+    - `join`할 때
+        - Controller에서 결과값으로 여러 테이블을 조인해서 줘야 할 경우가 빈번하다.
+            - → Entity 클래스만으로 표현하기가 어렵다.
+
+2022년 3월 4일
+
+😢 ...
+
+2022년 3월 5일
+
 - Postman + h2 web console
+    - 나는 application.properties보다 YAML을 선호한다.
+        - application.properties → application.yml
+    - H2 DB랑 연결해주기
+        - 쿼리를 보기 위해`show-sql: true` 설정을 해주었다.
+
+        ```yaml
+        spring:
+          datasource:
+            url: jdbc:h2:tcp://localhost/~/spring-webservice
+            username: sa
+            password:
+            driver-class-name: org.h2.Driver
+        
+          jpa:
+            hibernate:
+              ddl-auto: create
+            show-sql: true
+        ```
+
     - Postman으로 POST 요청 OK
+
+2022년 3월 4일
+
+- 생성시간/수정시간 자동화 - `JPA Auditing`
+    - 보통 Entity에는 해당 데이터의 생성시간과 수정시간이 들어간다.
+        - 차후 유지보수에 중요한 정보이기 때문이다.
+        - 매번 DB에 INSERT 하기 전, UPDATE 하기 전에 날짜 데이터를 등록/수정 하는 코드가 들어간다.
+
+            ```java
+            public void savePosts() {
+            		...
+            		posts.setCreateDate(new LocalDate());
+            		postsRepository.save(posts);
+            		...
+            }
+            ```
+
+    - LocalDate 사용
+        - Java의 기본 날짜 타입인 Date의 문제점을 고친 LocalDate와 LocalDateTime이 Java8부터 등장
+    - BaseTimeEntity 생성
+        - 모든 Entity들의 상위 클래스가 되어 Entity들의 createdDate, modifiedDAte를 자동으로 관리하는 역 할 !! 😃
+        - [MappedSuperClass](https://www.notion.so/MappedSuperClass-dd59a8a7fb9146a28001532c93f4641b)
+            - JPA Entity 클래스들이 BaseTimeEntity를 상속할 경우 필드를 createdDate, modifiedDate도 컬럼으로 인식하게 한다.
+        - [EntityListeners](https://www.notion.so/EntityListeners-972d0406f10147d4a209fbfd2e6e8b36)
+            - BaseTimeEntity 클래스에 Auditing 기능을 포함시킨다. + (AuditingEntityListener.class)
+
+        ```java
+        @Getter
+        @MappedSuperclass
+        @EntityListeners(AuditingEntityListener.class)
+        public class BaseTimeEntity {
+        
+            @CreatedDate
+            private LocalDateTime createdDate;
+        
+            @LastModifiedDate
+            private LocalDateTime modifiedDate;
+        }
+        
+        ```
+
+    - Posts 클래스가 BaseTimeEntity르 상속 받도록 변경
+        - `public class Posts extends BaseTimeEntity`
+    - `JPA Auditing 어노테이션`들을 모두 활성화 시킬 수 있도록 Application 클래스에 `활성화 어노테이션`을 추가해야 한다.
+- PostsRepositoryTest 클래스에 테스트 메서드 추가
+    - JPA Auditing을 이용한 LocalDateTime이 상속된 Entity에 잘 들어갔는가?  🙆‍♂️ ok
+
+      ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/b88e1f1f-44d7-4288-b619-be28ebfd47ad/Untitled.png)
+
+
+---
+
+- Thymeleaf로 View를 만들자
+    - 프로젝트 중간에 추가했기 때문에 implementation을 추가했다.
+
+    ```java
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+    ```
+
+    - WebController으로 main 페이지 띄우기 🙆‍♂️ ok
+        - ViewResolver 이용 된 것
+    - WebControllerTest 테스트 코드 🙆‍♂️ ok
+- Service 메서드 추가하기
+    - Service 메서드를 생성해서 `Transaction`까지 관리하기 위해
+        - [OSIV와 성능 최적화](https://www.notion.so/OSIV-0e1aafd1b33441b4a8e1341c1a37715f)
+- PostsService 생성
+    - PostsServiceTest 테스트코드 작성
+    - dto 패키지 만들어 분리
+    - 생성자에 `@Builder`추가
+- bootstarp 4.0, jQuery 추가
+- 🤢
+    - ㅇPostsService에서 PostsSaveRequestDto를 받아야 하는데 Controller에서 dto.toEntity()해서 Posts로 미리 형 변환해서 넘겨줘서 오류가 생겼었다.
