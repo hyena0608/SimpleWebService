@@ -30,7 +30,8 @@ public class PostsServiceTest {
     @Test
     public void DTO데이터가_posts테이블에_저장된다() throws Exception {
         //given
-        PostsSaveRequestDto dto = PostsSaveRequestDto.builder()
+        PostsSaveRequestDto dto = PostsSaveRequestDto
+                .builder()
                 .author("제이피에이조아@gmail.com")
                 .content("테스트")
                 .title("테스트 타이틀")
