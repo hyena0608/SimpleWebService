@@ -8,7 +8,6 @@ import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
-@Setter
 public class PostsSaveRequestDto {
 
     private String title;
@@ -16,6 +15,7 @@ public class PostsSaveRequestDto {
     private String author;
 
 
+    @Builder
     public Posts toEntity() {
         return Posts.builder()
                 .title(title)
