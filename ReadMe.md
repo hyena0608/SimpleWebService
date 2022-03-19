@@ -187,3 +187,14 @@
 - bootstarp 4.0, jQuery 추가
 - 🤢
     - ㅇPostsService에서 PostsSaveRequestDto를 받아야 하는데 Controller에서 dto.toEntity()해서 Posts로 미리 형 변환해서 넘겨줘서 오류가 생겼었다.
+
+### 2022년 03월 19일
+
+* EC2 생성 후 Elastic IP 설정, 보안설정
+* pem키 ~/.ssh에 copy해서 config 만들어서 git bash로 접속 완료
+* RDS 생성 후 접속하는데 오류 🤢
+  * 🙆‍♂ ok
+    * SSLHandshakeException으로 TLS Protocol 버전이 달라서 설정해서 해결함
+* MariaDB 파라미터 호환 오류 🤢
+  * 🙆‍♂ ok
+    * 버전에 따라 설정이 달라 여기서는 utf8이 아닌 utf8mb4 와 utf8mb4_general_ci로 한글이 깨지지 않게 설정하였다.
