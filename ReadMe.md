@@ -29,7 +29,7 @@
 
 # 개발 일지
 
-2022년 3월 2일
+### 2022년 3월 2일
 
 - Sourcetree를 설치했다.
     - 왜 필요할까?
@@ -65,7 +65,7 @@
         - 생성자의 경우 지금 채워야할 필드가 무엇인지 명확히 지정할 수가 없기 때문이다.
 
 
-2022년 3월 3일
+### 2022년 3월 3일
 
 - JpaRepository<Entity클래스, PK타입>
     - `ibatis`/`MyBatis` 등에서 DAO라고 불리는 DB Layer 접근자이다.
@@ -93,7 +93,7 @@
 
 😢 ...
 
-2022년 3월 5일
+### 2022년 3월 5일
 
 - Postman + h2 web console
     - 나는 application.properties보다 YAML을 선호한다.
@@ -187,6 +187,117 @@
 - bootstarp 4.0, jQuery 추가
 - 🤢
     - ㅇPostsService에서 PostsSaveRequestDto를 받아야 하는데 Controller에서 dto.toEntity()해서 Posts로 미리 형 변환해서 넘겨줘서 오류가 생겼었다.
+
+### 2022년 03월 12일
+
+- 게시글 목록
+    - data-h2.sql 작성
+        - 위 sql 파일이 프로젝트 실행 시 자동 수행되도록 설정
+            - application.yml
+                - spring.profiles 옵션
+                    - 어플리케이션 실행시 파라미터로 넘어온게 없으면 active값을 보게된다.
+                - local profile
+                    - data-h2.sql을 초기 데이터 실행 스크립트로 지정
+                    - 그외 환경에서는 해당 스크립트가 실행되지 않기 위해 local에 직접 등록
+                - `---`
+                    - 으로 상단 하단을 나눌 수 있다.
+
+                ```yaml
+                spring:
+                  datasource:
+                    url: jdbc:h2:tcp://localhost/~/spring-webservice
+                    username: sa
+                    password:
+                    driver-class-name: org.h2.Driver
+                
+                # local 환경
+                ---
+                spring:
+                  profiles: local
+                  datasource:
+                    data: classpath:data-h2.sql # 시작할때 실행시킬 script
+                  jpa:
+                    show-sql: true
+                    hibernate:
+                      ddl-auto: create-drop
+                  h2:
+                    console:
+                      enabled: true
+                ```
+
+- thymleaf 수정
+    - 테이블 생성해주기
+        - `<tr th:each="posts : ${posts}">`
+- PostsRepository
+    - `@Query`로 Spring Data JPA에서 제공하지 않는 메서드 제공 가능
+        - 💡 데이터 조회는 FK의 조인, 복잡한 조건 등으로 이런 Entity 클래스만으로 처리하기 어려워 조회용 프레임워크를 추가로 사용한다.
+            - 대표적 예시) QueryDSL, Jooq, MyBatis
+- PostsService
+    - findAllDesc() 생성
+        - `.map(PostsMainResponseDto:new`는 `.map(posts -> new PostsMainResponseDto(posts))`와 같다.
+- PostsMainResponseDto 생성
+    - toStringDateTIme 메서드
+        - View영역에서 LocalDateTime 타입을 모르기 때문에 인식할 수 있도록 문자열로 변경
+    - Entity는 DTO에 대해 전혀 모르게 코드를 구성해야 한다.
+        - DTO가 Entity에 의존하도록 코드를 작성해야 한다.
+- WebController
+    - Model에 리스트를 담아서 View로 보내기
+
+---
+
+- AWS
+- EC2 생성
+    - 보안
+        - SSH : 내 IP
+    - 키 페어
+- Elastic IP; 고정 IP
+    - 설정 안하면 계속해서 IP가 바뀌기에 도메인 할당 불가능
+    - 탄력적IP 할당
+    - 탄력적 IP 주소 연결
+        - 방금 생성한 인스턴스 연결
+        - 프라이빗 IP
+            - 방금 생성한 탄력적 IP 선택
+    - 인스턴스에서 탄력적 IP 할당 되었나 확인
+- EC2 터미널 접속
+    - puttygen 이용
+        - ssh1 generate
+        - public key, private key 저장
+    - AWS → EC2 → NETWORK&SECURITY → Key Pairs → Import Key Pair(키 페어 가져오기)
+        - puttygen에서 나온 public key 불러오기
+        - 생성한 공개 키 파일 추가 완료
+- AWS RDS 설정하기
+    - AWS의 Database 서비스인 RDS
+    - AWS에 RDS 검색
+    - 데이터베이스 생성
+    - MariaDB
+    - 템플릿 → 개발/테스트
+    - 스토리지 → 프리티어 : 20G
+    - 설정
+        - 사용자이름, 비밀번호, 데이터베이스 이름
+            - 외부에서 접근할 때 사용될 정보라 별도로 기억하자
+                - 추천
+                    - 읽기 권한만 있는 계정
+                    - 읽기/수정 권한을 모두 갖고 있는 계정
+    - DB 인스턴스 클래스
+        - 버스터블
+            - db.t3.micro
+    - 연결
+        - VPC 보안 그룹
+            - 새 보안 그룹 생성
+            - 이름지정
+    - 데이터베이스 옵션
+        - webservice
+
+      ![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/cf271fe2-7b2b-4b38-a1c8-510811d5de61/Untitled.png)
+
+    - 데이터베이스 생성
+    - EC2 인스턴스의 보안 그룹 ID 복사
+    - 보안 그룹 생성
+        - mysql / 보안그룹아이디
+        - mysql / 내 IP
+    - rds 페이지 들어가기
+        - RDS의 보안 그룹 변경
+            - 아까 만든 springboot-webservice-rds 선택
 
 ### 2022년 03월 19일
 
