@@ -314,4 +314,10 @@
 
 * Java 8, Git을 설치하고 Clone 까지 한 후에 `./gradlew test`를 진행하는데 오류가 발생했다 !
   * Permission denied 🤢
-    * `chmod +x gradlew`
+    * 🙆‍♂ ok
+      * `chmod +x gradlew`
+  * application.yml 재설정
+  * 배포 스크립트 작성
+  * 외부에서 서비스 접속
+    * AWS EC2 인스턴스 페이지 -> 보안 그룹 -> 현재 프로젝트의 인스턴스 -> 인바운드
+    * 사용자지정(TCP), 8080 포트 추가
