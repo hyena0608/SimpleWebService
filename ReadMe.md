@@ -326,13 +326,52 @@
 
 ### 2022년 04월 01일
 
-* travis 빌드 에러
-  * ./gradlew permission denied
-  * 원인
-    * 실행 권한이 없어서 발생함
-    * git ls-tree HEAD로 gradlew 권한 확인 : `100644`
-    * 권한 추가
-      * `git update-index --chmod = +x gradlew`
-      * 추가 후 커밋 엔 푸시 : `100755 gradlew`
-  * [![Build Status](https://app.travis-ci.com/hyena0608/spring-webservice.svg?branch=master)](https://app.travis-ci.com/hyena0608/spring-webservice) 추가 완료
-  * 
+* CI 툴 사용하기
+  * travis 빌드 에러
+    * ./gradlew permission denied
+    * 원인
+      * 실행 권한이 없어서 발생함
+      * git ls-tree HEAD로 gradlew 권한 확인 : `100644`
+      * 권한 추가
+        * `git update-index --chmod = +x gradlew`
+        * 추가 후 커밋 엔 푸시 : `100755 gradlew`
+    * [![Build Status](https://app.travis-ci.com/hyena0608/spring-webservice.svg?branch=master)](https://app.travis-ci.com/hyena0608/spring-webservice) 추가 완료
+    
+<br>
+
+* AWS CodeDeploy 연동하기
+  * AWS IAM 추가
+    * AmazonS3FullAccess 정책 연결
+    * AWSCodeDeployFullAccess 정책 연결
+
+### 2022년 04월 02일
+
+* AWS S3 버킷 생성
+* IAM Role 추가
+  * AWS 서비스 -> EC2 -> 사용 사례 선택
+    * AmazonEC2RoleforAWSCodeDeploy
+    * CodeDeployRole
+
+* EC2에 Code Deploy Role 추가
+  * EC2 인스턴스 - IAM 역할 연결/바꾸기
+    * EC2CodeDeployRole 선택
+
+* EC2에 CodeDeploy Agent 설치
+    ```bash
+    sudo yum -y update
+    sudo yum install -y aws-cli
+
+    cd ~
+    sudo aws configure
+  
+    aws s3 cp s3://aws-codedeploy-ap-northeast-2/latest/install . --region ap-northeast-2
+  
+    chmod +x ./install
+    ```
+
+* 에러 발생
+  * /usr/bin/env: ruby : No such file or directory
+  * 해당 에러는 rvm 혹은 ruby 미설치 에ㅓ
+  * ruby gems를 인스턴스에 설치하여 해결 가능
+  * `$ sudo yum -y install gem
+    `
