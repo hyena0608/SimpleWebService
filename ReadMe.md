@@ -1,3 +1,5 @@
+[![Build Status](https://app.travis-ci.com/hyena0608/spring-webservice.svg?branch=master)](https://app.travis-ci.com/hyena0608/spring-webservice)
+
 # 알게 된 점
 
 - Repository 인터페이스에 `JpaRepository<Entity클래스, PK타입>` 상속
@@ -321,3 +323,16 @@
   * 외부에서 서비스 접속
     * AWS EC2 인스턴스 페이지 -> 보안 그룹 -> 현재 프로젝트의 인스턴스 -> 인바운드
     * 사용자지정(TCP), 8080 포트 추가
+
+### 2022년 04월 01일
+
+* travis 빌드 에러
+  * ./gradlew permission denied
+  * 원인
+    * 실행 권한이 없어서 발생함
+    * git ls-tree HEAD로 gradlew 권한 확인 : `100644`
+    * 권한 추가
+      * `git update-index --chmod = +x gradlew`
+      * 추가 후 커밋 엔 푸시 : `100755 gradlew`
+  * [![Build Status](https://app.travis-ci.com/hyena0608/spring-webservice.svg?branch=master)](https://app.travis-ci.com/hyena0608/spring-webservice) 추가 완료
+  * 
