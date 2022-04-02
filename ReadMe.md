@@ -369,9 +369,12 @@
     chmod +x ./install
     ```
 
-* 에러 발생
+* ruby 에러 발생
   * /usr/bin/env: ruby : No such file or directory
   * 해당 에러는 rvm 혹은 ruby 미설치 에ㅓ
   * ruby gems를 인스턴스에 설치하여 해결 가능
   * `$ sudo yum -y install gem
-    `
+
+* test 에러 발생
+  * 
+      `
