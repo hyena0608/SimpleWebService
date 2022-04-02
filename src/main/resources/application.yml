@@ -5,9 +5,6 @@ spring:
 # local 환경
 ---
 spring:
-  profiles: local
-  datasource:
-    data: classpath:data-h2.sql # 시작할때 실행시킬 script
   jpa:
     show-sql: true
     hibernate:
@@ -15,3 +12,9 @@ spring:
   h2:
     console:
       enabled: true
+  config:
+    activate:
+      on-profile:
+  sql:
+    init:
+      data-locations: classpath:data-h2.sql
