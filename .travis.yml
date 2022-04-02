@@ -1,18 +1,18 @@
 language: java
- jdk:
-   - openjdk8
+jdk:
+  - openjdk8
 
- branches:
-   only:
-     - master
+branches:
+  only:
+    - master
 
  # Travis CI 서버의 Home
- cache:
-   directories:
-     - '$HOME/.m2/repository'
-     - '$HOME/.gradle'
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.gradle'
 
- script: "./gradlew clean build"
+script: "./gradlew clean build"
 
 deploy:
   - provider: s3
@@ -28,7 +28,7 @@ deploy:
       branch: master
 
  # CI 실행 완료시 메일로 알람
- notifications:
-   email:
-     recipients:
-       - goatsfish@gmail.com
+notifications:
+  email:
+    recipients:
+      - goatsfish@gmail.com
