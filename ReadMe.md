@@ -384,5 +384,10 @@
 * AWS CodeDeploy 설정
   * appspec.yml 추가
   * .travis.yml에 codedeploy 설정 추가
+  * appspec.yml 추가
+  * 
 
-*  
+* CodeDeploy로 스크립트 실행
+  * execute-deploy.sh 실행하게 설정
+
+***테스트, 빌드, 배포까지 전부 자동화 완료***
