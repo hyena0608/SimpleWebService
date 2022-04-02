@@ -25,6 +25,9 @@ before_deploy:
   - mkdir -p deploy
   - mv spring-webservice.zip deploy/spring-webservice.zip
 
+before_install:
+  - chmod +x gradlew
+
 deploy:
   - provider: s3
     access_key_id: $AWS_ACCESS_KEY # Travis repo settings에 설정된 값
