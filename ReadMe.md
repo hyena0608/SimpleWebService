@@ -371,10 +371,14 @@
 
 * ruby 에러 발생
   * /usr/bin/env: ruby : No such file or directory
-  * 해당 에러는 rvm 혹은 ruby 미설치 에ㅓ
+  * 해당 에러는 rvm 혹은 ruby 미설치 에러
   * ruby gems를 인스턴스에 설치하여 해결 가능
   * `$ sudo yum -y install gem
 
 * test 에러 발생
-  * 
-      `
+  * auto sql이 잘못됨
+  * .travis.yml 틀린 부분
+  * S3에 ACL 권한 설정이 안됐었음
+  * 3가지 오류 해결 완료
+
+* 
