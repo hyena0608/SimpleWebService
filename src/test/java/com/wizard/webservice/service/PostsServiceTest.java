@@ -42,14 +42,6 @@ public class PostsServiceTest {
                 .title("테스트 타이틀")
                 .build();
 
-        //when
-        postsService.save(dto);
-
-        //then
-        Posts posts = postsRepository.findAll().get(0);
-        assertThat(posts.getAuthor()).isEqualTo(dto.getAuthor());
-        assertThat(posts.getContent()).isEqualTo(dto.getContent());
-        assertThat(posts.getTitle()).isEqualTo(dto.getTitle());
     }
 
 }
